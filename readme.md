@@ -1,4 +1,30 @@
-**Status:** Maintenance (expect bug fixes and minor updates)
+**Status:** This fork does not support and require tensorflow. Moreover it only supports the pytorch version of ddpg algo with new supported gymnasium instead of OpenAI gym.
+
+Install with (inside root of repo):
+```
+pip install -e .
+```
+
+To start, use the following
+```
+python3 spinup/algos/pytorch/ddpg/ddpg.py
+```
+
+It also reloads the latest model.pt if exists and start human render mode.
+
+One can extract the single actor (and critic) mlp with the following:
+
+```
+python3 spinup/algos/pytorch/ddpg/extract_mlp.py
+```
+
+To get a destilled student model, one can run the following:
+
+```
+python3 spinup/algos/pytorch/ddpg/simple_knowledge_destillation.py
+```
+
+All output models are put in `spinup/data/ddpg/ddpg_s0/pyt_save/`
 
 Welcome to Spinning Up in Deep RL! 
 ==================================

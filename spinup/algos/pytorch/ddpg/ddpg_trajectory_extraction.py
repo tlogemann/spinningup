@@ -43,10 +43,10 @@ class ReplayBuffer:
 
 
 def ddpg(env_fn, actor_critic=core.MLPActorCritic, ac_kwargs=dict(), seed=0,
-         steps_per_epoch=4000, epochs=100, replay_size=int(1e6), gamma=0.99,
-         polyak=0.995, pi_lr=1e-3, q_lr=1e-3, batch_size=100, start_steps=0,
-         update_after=500, update_every=10, act_noise=0, num_test_episodes=10,
-         max_ep_len=1000, logger_kwargs=dict(), save_freq=1, extract_points=False):
+         steps_per_epoch=2000, epochs=100 ,chs=100, replay_size=int(1e6), gamma=0.99,
+         polyak=0.995, pi_lr=1e-4, q_lr=1e-3, batch_size=20, start_steps=100,
+         update_after=10, update_every=5, act_noise=0.1, num_test_episodes=10,
+         max_ep_len=500, logger_kwargs=dict(), save_freq=1):
     """
     Deep Deterministic Policy Gradient (DDPG)
 
@@ -146,13 +146,9 @@ def ddpg(env_fn, actor_critic=core.MLPActorCritic, ac_kwargs=dict(), seed=0,
 
     # Create actor-critic module and target networks
     ac = actor_critic(env.observation_space, env.action_space, **ac_kwargs)
-
-    model_path = "../../../data/ddpg/ddpg_s0/pyt_save/model.pt"
+    model_path = "../../../../data/ddpg/ddpg_s0/pyt_save/model.pt"
     if os.path.isfile(model_path):
         ac = torch.load(model_path)
-    model_path = "../../../data/ddpg/ddpg_s0/pyt_save/smaller_ac_pi_pi_model.pt"
-    if os.path.isfile(model_path):
-        ac.pi.pi = torch.load(model_path)
     ac_targ = deepcopy(ac)
 
     # Freeze target networks with respect to optimizers (only update via polyak averaging)
@@ -247,8 +243,6 @@ def ddpg(env_fn, actor_critic=core.MLPActorCritic, ac_kwargs=dict(), seed=0,
                 ep_len += 1
             logger.store(TestEpRet=ep_ret, TestEpLen=ep_len)
 
-    points = {'x': [], 'y': [], 'z': [], 'r': []}
-
     # Prepare for interaction with environment
     total_steps = steps_per_epoch * epochs
     start_time = time.time()
@@ -268,14 +262,6 @@ def ddpg(env_fn, actor_critic=core.MLPActorCritic, ac_kwargs=dict(), seed=0,
 
         # Step the env
         o2, r, d, truncated, _ = env.step(a)
-
-        if extract_points:
-            o_list = list(o)
-            points['x'].append(float(o_list[0]))
-            points['y'].append(float(o_list[1]))
-            points['z'].append(float(list(a)[0]))
-            points['r'].append(r)
-
         ep_ret += r
         ep_len += 1
 
@@ -296,12 +282,6 @@ def ddpg(env_fn, actor_critic=core.MLPActorCritic, ac_kwargs=dict(), seed=0,
             logger.store(EpRet=ep_ret, EpLen=ep_len)
             o, ep_ret, ep_len = env.reset(), 0, 0
             o = o[0]
-            if extract_points:
-                import json
-
-                with open('action_points.json', 'w', encoding='utf-8') as f:
-                    json.dump(points, f, ensure_ascii=False, indent=4)
-                return
 
         # Update handling
         if t >= update_after and t % update_every == 0:
@@ -337,19 +317,18 @@ if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument('--env', type=str, default='MountainCarContinuous-v0')
-    parser.add_argument('--hid', type=int, default=16)
+    parser.add_argument('--hid', type=int, default=8)
     parser.add_argument('--l', type=int, default=2)
     parser.add_argument('--gamma', type=float, default=0.99)
     parser.add_argument('--seed', '-s', type=int, default=0)
     parser.add_argument('--epochs', type=int, default=100)
     parser.add_argument('--exp_name', type=str, default='ddpg')
-    parser.add_argument('--extract_points', type=bool, default=True)
     args = parser.parse_args()
 
     from spinup.utils.run_utils import setup_logger_kwargs
     logger_kwargs = setup_logger_kwargs(args.exp_name, args.seed)
 
-    ddpg(lambda : gym.make(args.env, render_mode="human"), core.MLPActorCritic,
+    ddpg(lambda : gym.make(args.env), core.MLPActorCritic,
          ac_kwargs=dict(hidden_sizes=[args.hid]*args.l),
          gamma=args.gamma, seed=args.seed, epochs=args.epochs,
-         logger_kwargs=logger_kwargs, extract_points=args.extract_points)
+         logger_kwargs=logger_kwargs)
