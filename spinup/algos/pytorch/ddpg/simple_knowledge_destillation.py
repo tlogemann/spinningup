@@ -9,8 +9,8 @@ from pytorch_lightning.callbacks.progress import TQDMProgressBar
 from torch import nn
 from torch.utils.data import DataLoader, TensorDataset, random_split
 
-xs = torch.linspace(-1.2, -0.07, steps=100)
-ys = torch.linspace(0.6, 0.07, steps=100)
+xs = torch.linspace(-1.2, 0.6, steps=100)
+ys = torch.linspace(-0.07, 0.07, steps=100)
 x, y = torch.meshgrid(xs, ys, indexing='xy')
 
 xr = torch.reshape(x, (-1, 1))
