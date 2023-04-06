@@ -8,3 +8,5 @@ __pycache__/
 .DS_Store
 _build/
 *.patch
+data/ddpg/ddpg_s0/config.json
+data/ddpg/ddpg_s0/progress.txt

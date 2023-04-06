@@ -147,10 +147,13 @@ def ddpg(env_fn, actor_critic=core.MLPActorCritic, ac_kwargs=dict(), seed=0,
     # Create actor-critic module and target networks
     ac = actor_critic(env.observation_space, env.action_space, **ac_kwargs)
 
-    model_path = "../../../data/ddpg/ddpg_s0/pyt_save/model.pt"
+    model_path = "../../../../data/ddpg/ddpg_s0/pyt_save/model.pt"
     if os.path.isfile(model_path):
         ac = torch.load(model_path)
-    model_path = "../../../data/ddpg/ddpg_s0/pyt_save/smaller_ac_pi_pi_model.pt"
+
+    pyt_save_path = '../../../../../models'
+    model_path = os.path.join(pyt_save_path, 'smaller_ac_pi_pi_model_2_8_8_1.pt')
+
     if os.path.isfile(model_path):
         ac.pi.pi = torch.load(model_path)
     ac_targ = deepcopy(ac)

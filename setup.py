@@ -16,6 +16,7 @@ setup(
     install_requires=[
         'cloudpickle==1.2.1',
         'gymnasium',
+        'gymnasium[classic-control]',
         'ipython',
         'joblib',
         'matplotlib==3.6.2',

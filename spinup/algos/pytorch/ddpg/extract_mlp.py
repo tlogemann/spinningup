@@ -7,9 +7,9 @@ model = None
 # Source: https://stackoverflow.com/a/50098973
 file_dir = str(Path().absolute())
 
-pyt_save_path = os.path.join(file_dir, '../../../data/ddpg/ddpg_s0/pyt_save')
+pyt_save_path = os.path.join(file_dir, '../../../../ata/ddpg/ddpg_s0/pyt_save')
 
-model_path = os.path.join(pyt_save_path, 'model.pt')
+model_path = os.path.join(pyt_save_path, 'mountain_car_cont_ddpg_model_ac_pi_pi.pt')
 
 if os.path.isfile(model_path):
     ac = torch.load(model_path)
